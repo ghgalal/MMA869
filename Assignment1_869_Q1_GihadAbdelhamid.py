@@ -99,7 +99,7 @@ plt.ylabel('Savings', fontsize=14);
 # In[454]:
 
 
-#Standardizing the data
+#Standardizing the data and saving it in a new variable
 from sklearn.preprocessing import StandardScaler
 scaler=StandardScaler()
 X_scaled=scaler.fit_transform(X)
@@ -112,16 +112,22 @@ X_scaled
 # Answer to Question 1, Part 1b
 # Cluster the data using any clustering algorithm discussed in class. 
 # Measure goodness-of-fit. Try different values of hyper parameters to see how they affect goodness-of-fit.
+
+# The following code uses KMeans as a clustering algorithm and at the end, 
+# I will use DBSCAN to validate the approach that I followed at the beginning
+
+# Initializing the cluster size with 5
 K=5
 
 from sklearn.cluster import KMeans
 k_means=KMeans(init="k-means++", n_clusters=K, random_state=42)
 k_means.fit(X_scaled)
 
-# WCSS == Inertia
+# check the Inertia
 print('WCSS/Intertia Score for K: {}'.format(K))
 k_means.inertia_
 
+# check the Sillouette
 print('Sillouette Score for K: {}'.format(K))
 silhouette_score(X, k_means.labels_)
 sample_silhouette_values = silhouette_samples(X, k_means.labels_)
@@ -147,9 +153,9 @@ means
 # In[458]:
 
 
+# Plot Age and Income and mark the cluster centers 
 plt.style.use('default');
 
-#plt.figure(figsize=(12, 10));
 plt.grid(True);
 
 sc = plt.scatter(X[:, 0], X[:, 1], s=20, c=k_means.labels_);
@@ -173,7 +179,7 @@ for k in range(2, 11):
     silhouettes[k] = silhouette_score(X_scaled, kmeans.labels_)
     print("for k={}, inertia={} and silhouette={}".format(k,inertias[k], silhouettes[k]))
     
-
+# Plotting the inertia values for each K value
 plt.figure();
 plt.grid(True);
 plt.plot(list(inertias.keys()), list(inertias.values()));
@@ -181,7 +187,7 @@ plt.title('K-Means, Elbow Method')
 plt.xlabel("Number of clusters, K");
 plt.ylabel("Inertia");
 
-
+# Plotting the Silhouette values for each K value
 plt.figure();
 plt.grid(True);
 plt.plot(list(silhouettes.keys()), list(silhouettes.values()));
@@ -190,37 +196,26 @@ plt.xlabel("Number of clusters, K");
 plt.ylabel("Silhouette");
 
 
-# In[463]:
+# In[468]:
 
 
 # Answer to Question 1, Part 1c
 # Print the Stats for the whole data set
 # The cluster size I selected is 5 based on the Inertia score
 
+# rerun the KMeans for K value 5
 K=5
 from sklearn.cluster import KMeans
 k_means=KMeans(init="k-means++", n_clusters=K, random_state=42)
 k_means.fit(X_scaled)
 
 # Print Labels and cluster centers
-k_means.labels_
-k_means.cluster_centers_
+#k_means.labels_
+#k_means.cluster_centers_
 means = scaler.inverse_transform(k_means.cluster_centers_)
 
 
-# In[465]:
-
-
-# Print the stats for each cluster
-labels=k_means.labels_
-for i, label in enumerate(set(labels)):
-    print('\nCluster {}:'.format(label))
-    print('Number of Instances: {}'.format(d.nobs))
-    d = stats.describe(X_scaled[labels==label], axis=0)
-    display(stats_to_df(d, scaler))
-
-
-# In[466]:
+# In[470]:
 
 
 from scipy import stats
@@ -250,6 +245,14 @@ print('All Data:')
 print('Number of Instances: {}'.format(X.shape[0]))
 d = stats.describe(X_scaled, axis=0)
 display(stats_to_df(d, scaler))
+
+# Print the stats for each cluster
+labels=k_means.labels_
+for i, label in enumerate(set(labels)):
+    d = stats.describe(X_scaled[labels==label], axis=0)
+    print('\nCluster {}:'.format(label))
+    print('Number of Instances: {}'.format(d.nobs))
+    display(stats_to_df(d, scaler))
 
 
 # In[467]:
