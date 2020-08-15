@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[417]:
+# In[1]:
 
 
 # Gihad Abdelhamid
@@ -11,11 +11,11 @@
 # 869
 # 16-Aug-2020
 
-# Answer to Question 1, Part 1a
-#Load, clean, and preprocess the data as you find necessary
 
+# ## Answer to Question 1, Part 1a
+# Load, clean, and preprocess the data as you find necessary
 
-# In[445]:
+# In[2]:
 
 
 #Import Packages
@@ -23,26 +23,29 @@ import pandas as pd
 import numpy as np
 
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.cluster import DBSCAN
+from sklearn.metrics import silhouette_score, silhouette_samples
 
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
 
 
-# In[446]:
+# In[3]:
 
 
 # Read in data from jewelry_customers.csv I am assuming that you have the file in the same directory as the py file
 df = pd.read_csv("jewelry_customers.csv")
 
 
-# In[447]:
+# In[4]:
 
 
 # Check some data frame info
 df.info()
 
 
-# In[448]:
+# In[5]:
 
 
 # Checking if there is any negative values
@@ -52,21 +55,21 @@ df.index[df['SpendingScore'] < 0]
 df.index[df['Savings'] < 0]
 
 
-# In[449]:
+# In[6]:
 
 
 # Convert the frame 
 X=df.to_numpy()
 
 
-# In[450]:
+# In[7]:
 
 
 # Print the frame
 X
 
 
-# In[451]:
+# In[8]:
 
 
 # Plotting Age and Income
@@ -76,7 +79,7 @@ plt.xlabel('Age', fontsize=14);
 plt.ylabel('Income', fontsize=14);
 
 
-# In[452]:
+# In[9]:
 
 
 # Plotting Age and SpendingScore
@@ -86,7 +89,7 @@ plt.xlabel('Age', fontsize=14);
 plt.ylabel('Spending Score', fontsize=14);
 
 
-# In[453]:
+# In[10]:
 
 
 # Plotting Age and Savings
@@ -96,7 +99,7 @@ plt.xlabel('Age', fontsize=14);
 plt.ylabel('Savings', fontsize=14);
 
 
-# In[454]:
+# In[11]:
 
 
 #Standardizing the data and saving it in a new variable
@@ -106,10 +109,11 @@ X_scaled=scaler.fit_transform(X)
 X_scaled
 
 
-# In[455]:
+# ## Answer to Question 1, Part 1b
+
+# In[12]:
 
 
-# Answer to Question 1, Part 1b
 # Cluster the data using any clustering algorithm discussed in class. 
 # Measure goodness-of-fit. Try different values of hyper parameters to see how they affect goodness-of-fit.
 
@@ -119,7 +123,7 @@ X_scaled
 # Initializing the cluster size with 5
 K=5
 
-from sklearn.cluster import KMeans
+
 k_means=KMeans(init="k-means++", n_clusters=K, random_state=42)
 k_means.fit(X_scaled)
 
@@ -134,14 +138,14 @@ sample_silhouette_values = silhouette_samples(X, k_means.labels_)
 sample_silhouette_values
 
 
-# In[456]:
+# In[13]:
 
 
 # Print the cluster IDs
 k_means.labels_
 
 
-# In[457]:
+# In[14]:
 
 
 # Print the centers
@@ -150,7 +154,7 @@ means = scaler.inverse_transform(k_means.cluster_centers_)
 means
 
 
-# In[458]:
+# In[15]:
 
 
 # Plot Age and Income and mark the cluster centers 
@@ -167,10 +171,10 @@ plt.yticks(fontsize=14);
 plt.scatter(means[:, 0], means[:, 1], marker='x',c="black")
 
 
-# In[462]:
+# In[16]:
 
 
-# Playing with K, setting between 2 and 6
+# Playing with K, setting between 2 and 11
 inertias = {}
 silhouettes = {}
 for k in range(2, 11):
@@ -196,16 +200,17 @@ plt.xlabel("Number of clusters, K");
 plt.ylabel("Silhouette");
 
 
-# In[468]:
+# ## Answer to Question 1, Part 1c
+
+# In[17]:
 
 
-# Answer to Question 1, Part 1c
 # Print the Stats for the whole data set
 # The cluster size I selected is 5 based on the Inertia score
 
 # rerun the KMeans for K value 5
 K=5
-from sklearn.cluster import KMeans
+
 k_means=KMeans(init="k-means++", n_clusters=K, random_state=42)
 k_means.fit(X_scaled)
 
@@ -215,7 +220,7 @@ k_means.fit(X_scaled)
 means = scaler.inverse_transform(k_means.cluster_centers_)
 
 
-# In[470]:
+# In[18]:
 
 
 from scipy import stats
@@ -255,11 +260,11 @@ for i, label in enumerate(set(labels)):
     display(stats_to_df(d, scaler))
 
 
-# In[467]:
+# In[19]:
 
 
 #trying DBSCAN
-from sklearn.cluster import DBSCAN
+
 dbscan=DBSCAN(eps=0.4, min_samples=3)
 dbscan.fit(X_scaled)
 dbscan.labels_
